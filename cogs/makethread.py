@@ -90,13 +90,10 @@ class TB_Thread_Creation(commands.Cog):
                     loop_amount -= 1
         else:
             await ctx.send(embed=created)
-        # Figure out how to iterate over records with asyncpg
-        # try:
-        #     self.bot.thread_channels.get[ctx.guild.id].append(thread_channel.id)
-        #     print(f'Appending to key: {self.bot.thread_channels}')
-        # except (AttributeError, TypeError):
-        #     self.bot.thread_channels[ctx.guild.id] = [thread_channel.id]
-        #     print(f'Initial key creation: {self.bot.thread_channels}')
+        try:
+            self.bot.thread_check_cache[ctx.guild.id].append(thread_channel.id)
+        except KeyError:
+            self.bot.thread_check_cache[ctx.guild.id] = [thread_channel.id]
 
 
 def setup(bot):
