@@ -1,5 +1,5 @@
 # Thread-Bot
-An attempt to bring forum functionality to Discord.
+An attempt to bring forum functionality to Discord. Including thread locking, category creation and organization and thread clean-up.
 
 # Commands:
 
@@ -16,4 +16,9 @@ An attempt to bring forum functionality to Discord.
 | `.tim` | N/A | Sends an invite link for the bot to the channel command was invoked in. |
 
 # Invite this bot to your server:
+https://discordapp.com/oauth2/authorize?client_id=617376702187700224&permissions=268561424&scope=bot
 
+
+# Support server
+Join this server to report issues with the bot or just to chat with other people.
+discord.gg/M8DmU86
