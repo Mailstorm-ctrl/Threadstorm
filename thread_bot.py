@@ -10,10 +10,7 @@ from discord.ext import commands
 
 # TODO:
 #       Let users change thread embed color
-#       Custom thread categories
 #       purge command
-#       Hide SQL table names via env
-#       #Final test
 
 def prefix_callable(bot_client, message):
     try:
@@ -84,11 +81,9 @@ if __name__ == '__main__':
     bot.prefix = psycopg2.connect(**DB_SETTINGS)
     bot.db = db_loop.run_until_complete(asyncpg.create_pool(**DB_SETTINGS, max_inactive_connection_lifetime=480))
 
-# Figure out how to get more than one record with asyncpg
 async def populate():
      sql = database(bot.db)
      bot.thread_check_cache = await sql.get_thread_channels()
-#     print(bot.thread_channels)
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(populate())
