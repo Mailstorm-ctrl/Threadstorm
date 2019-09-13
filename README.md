@@ -15,7 +15,7 @@ An attempt to bring forum functionality to Discord. Including thread locking, ca
 | `.thelp` | N/A | Displays this help menu in Discord. |
 | `.tim` | N/A | Sends an invite link for the bot to the channel command was invoked in. |
 
-### Command Notes:
+##### Command Notes:
 When using commands that create a text channel or a new category, the channel/category will have *the same permissions as the channel the command was invoked in*. So if your server requires a role to gain access to the rest of the server, the commands will handle this automatically to prevent bypassing your checkpoint.
 
 # Invite this bot to your server:
