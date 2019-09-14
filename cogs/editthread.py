@@ -10,7 +10,7 @@ class TB_Edit_Threads(commands.Cog):
         self.bot = bot
 
     async def is_thread(ctx):
-        if ctx.channel.id in bot.thread_check_cache.get(ctx.guild.id):
+        if ctx.channel.id in ctx.bot.thread_check_cache.get(ctx.guild.id):
             return True
         else:
             return False
