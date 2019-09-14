@@ -1,4 +1,4 @@
-# Thread-Bot
+# Threadstorm
 An attempt to bring forum functionality to Discord. Including thread locking, category creation and organization and thread clean-up.
 
 # Commands:
