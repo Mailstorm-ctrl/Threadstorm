@@ -13,7 +13,9 @@ class TB_errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.BadUnionArgument):
+        if isinstance(error, commands.CommandNotFound):
+            return
+        elif isinstance(error, commands.BadUnionArgument):
             embed=discord.Embed(title="Failed to convert an argument!", description=f"{ctx.author.mention}, something hapened with your command.\nThe parameter: {error.param.name} failed to convert.\nThe converter(s): {error.converters} failed.", color=ERROR_COLOR)
             embed.set_author(name=ctx.bot.user.name, url="https://github.com/Mailstorm-ctrl/Thread-Bot", icon_url=ctx.bot.user.avatar_url)
             await ctx.send(embed=embed)
