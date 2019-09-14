@@ -45,8 +45,8 @@ class TB_Category_Creation(commands.Cog):
                 It can only be ran in channels that belong to a category that I have made and isn't the default channel.")
             return
         else:
-            await ctx.send(f"Are you sure? This will delete the category and __***ALL***__ channels that belong to this category. \
-                            To confirm, please paste in the categorys ID:\n{ctx.channel.category.id}")
+            await ctx.send(f"""Are you sure? This will delete the category and __***ALL***__ channels that belong to this category.
+                            To confirm, please paste in the categorys ID:\n{ctx.channel.category.id}""")
             try:
                 confirm = await self.bot.wait_for('message',
                                                 check=lambda m : m.author.id == ctx.author.id and int(m.content) in custom_category_check.get(str(ctx.guild.id)),
