@@ -50,9 +50,12 @@ class TB_Thread_Creation(commands.Cog):
                 step += 1
         default = True
         custom_category_check = await sql.get_custom_categories(ctx.guild)
-        custom_category_check = json.loads(custom_category_check[0])
-        if ctx.channel.category.id in custom_category_check.get(str(ctx.guild.id)):
-            default = False
+        try:
+            custom_category_check = json.loads(custom_category_check[0])
+            if ctx.channel.category.id in custom_category_check.get(str(ctx.guild.id)):
+                default = False
+        except:
+            pass
 
         if abort == 'abort':
             if not default:
