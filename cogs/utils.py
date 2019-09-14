@@ -22,10 +22,9 @@ class TB_Utils(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.guild is None:
+        if message.guild is None or message.author.bot:
             return
-        if not message.author.bot:
-            if message.channel.id in self.bot.thread_check_cache.get(message.guild.id):
+        if message.channel.id in self.bot.thread_check_cache.get(message.guild.id):
                 sql = database(self.bot.db)
                 await sql.update_last_message(message.channel)
 
