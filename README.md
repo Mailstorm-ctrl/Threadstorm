@@ -1,5 +1,5 @@
 # Threadstorm
-An attempt to bring forum functionality to Discord. Including thread locking, category creation and organization and thread clean-up.
+An attempt to bring forum functionality to Discord. Including thread locking, category creation for organization and thread clean-up.
 
 # Commands:
 
@@ -23,6 +23,6 @@ https://discordapp.com/oauth2/authorize?client_id=617376702187700224&permissions
 
 
 # Support server
-Join this server to report issues with the bot or just to chat with other people.
+Join this server to report issues or get help with the bot. Alternatively, join to talk with other people.
 
 https://discord.gg/M8DmU86
