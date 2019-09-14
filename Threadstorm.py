@@ -69,7 +69,8 @@ cogs = ['cogs.makethread',
         'cogs.embeds',
         'cogs.utils', 
         'cogs.create_category', 
-        'cogs.errors']
+        'cogs.errors',
+        ]
 
 
 for cog in cogs:
