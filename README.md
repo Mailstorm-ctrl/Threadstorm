@@ -7,7 +7,7 @@ An attempt to bring forum functionality to Discord. Including thread locking, ca
 |:---:|:---:|:---|
 | `.tmake` | N/A | This command will start the process of making a thread. Ask for a thread title and the body. Has a cooldown of 2 uses per hour. Takes no arguments.|
 | `.tedit` | REQUIRED: body, title or image | Allows the author of the thread or a member with the manage_messages permissions to modify the threads original post. You may upload an image with the command to use your image, or provide a valid url.<br />Example:<br />`.tedit title The Super Shotty is an objectivly bad weapon. It is underpowered`|
-| `.tkeep` | N/A | | Allows you to "keep" a thread from being deleted due to inactivity. This is a toggle command. Run this command to toggle the delete flag on and off. You will need the `manage_channels` permission to run this.| 
+| `.tkeep` | N/A | Allows you to "keep" a thread from being deleted due to inactivity. This is a toggle command. Run this command to toggle the delete flag on and off. You will need the `manage_channels` permission to run this.| 
 | `.tlock` | OPTIONAL: reason | Allows members with the manage_message permission to lock threads. This will go through and set the send_messages permission to False for every role that has access to the channel/thread. This is a moderation command.<br />Example:<br />`.tlock The Super Sotty is fine. Get better.`|
 | `.tunlock` | N/A | Unlocks a thread. Returns to the channels original permission structure. |
 | `.tcreate` | REQUIRED: category-name | Lets you create a custom category for your server. Must have the manage_channels permission to run this.<br />Example:<br />`.tcreate Game Talk`|
