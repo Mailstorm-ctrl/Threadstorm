@@ -20,11 +20,13 @@ An attempt to bring forum functionality to Discord. Including thread locking, ca
 When using commands that create a text channel or a new category, the channel/category will have *the same permissions as the channel the command was invoked in*. So if your server requires a role to gain access to the rest of the server, the commands will handle this automatically to prevent bypassing your checkpoint.
 
 # Invite this bot to your server:
-https://discordapp.com/oauth2/authorize?client_id=617376702187700224&permissions=26640&scope=bot
+https://discordapp.com/oauth2/authorize?client_id=617376702187700224&permissions=268443664&scope=bot
 ##### Why it needs the permissions it request:
 `Manage Channel`: This is needed so it can create channels. When you invite this bot to your server, it will create a category named "threads" which is the default location all threads will be put. This also allows the bot to lock/unlock threads. 
 
 `Manage Messages`: When a thread is created, it will pin the original post (In the channel the bot makes). For custom categories, it will delete commands used to create threads to keep the channel clean.
+
+`Manage Roles`: Needed to lock/unlock threads.
 
 # Support server
 Join this server to report issues or get help with the bot. Alternatively, join to talk with other people.
