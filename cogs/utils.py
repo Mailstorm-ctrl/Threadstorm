@@ -24,12 +24,28 @@ class TB_Utils(commands.Cog):
     async def on_message(self, message):
         if message.guild is None or message.author.bot:
             return
-        if message.channel.id in self.bot.thread_check_cache.get(message.guild.id):
-                sql = database(self.bot.db)
-                await sql.update_last_message(message.channel)
+        if message.content == self.bot.user.mention:
+            try:
+                sql = database(self.bot.prefix)
+                prefix = sql.get_prefix(message.guild)
+                embed = discord.Embed(title='Guild prefix:', description=f'{message.guild.name} uses the prefix: `{prefix[0]}` for all commands.', color=0x69dce3)
+                embed.set_author(name=message.guild.name, icon_url=message.guild.icon_url)
+                await message.channel.send(embed=embed)
+            except:
+                embed = discord.Embed(title='Guild prefix:', description=f'{message.guild.name} uses the prefix: `.` for all commands.', color=0x69dce3)
+                embed.set_author(name=message.guild.name, icon_url=message.guild.icon_url)
+                await message.channel.send(embed=embed)
+            return
+        try:
+            if message.channel.id in self.bot.thread_check_cache.get(message.guild.id):
+                    sql = database(self.bot.db)
+                    await sql.update_last_message(message.channel)
+        except TypeError:
+            pass
 
-    @commands.command(name='setup', aliases=['tsetup'])
+    @commands.command(name='setup', aliases=['tsetup'], hidden=True)
     @commands.has_permissions(manage_guild=True)
+    @commands.guild_only()
     async def create_guild_join(self, ctx):
         thread_category = discord.utils.get(ctx.guild.categories, name='THREADS')
         sql = database(self.bot.db)
@@ -40,13 +56,14 @@ class TB_Utils(commands.Cog):
 
     @commands.command(name='prefix', aliases=['tprefix'])
     @commands.has_permissions(manage_roles=True)
+    @commands.guild_only()
     async def update_prefix(self, ctx, prefix: str):
         sql = database(self.bot.db)
         await sql.update_prefix(ctx.guild, prefix)
         await ctx.send(f"Prefix updated to: {prefix}")
         return
 
-    @commands.command(name='help')
+    @commands.command(name='help', aliases=['thelp'])
     async def thelp(self, ctx): # Yes I know bad. Use built-in help, don't hard-code yada
         embed = await TB_Embeds.thelp(ctx)
         await ctx.send(embed=embed)
