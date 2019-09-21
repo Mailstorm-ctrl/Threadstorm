@@ -4,6 +4,7 @@ import typing
 import json
 from database.database import database
 from cogs.embeds import TB_Embeds
+from cogs.checks import TB_Checks
 from discord.ext import commands
 
 
@@ -14,6 +15,8 @@ class TB_Thread_Creation(commands.Cog):
 
     @commands.command(name='makethread',aliases=['tmake'])
     @commands.cooldown(2, 7200,type=commands.BucketType.member)
+    @commands.bot_has_permissions(manage_messages=True, manage_channels=True)
+    @commands.guild_only()
     async def manual_create(self, ctx):
         """Lets members create their own threads. This command will put
         "threads" that aren't in a custom category into the general threads category the bot made when it joined the server.
