@@ -26,14 +26,16 @@ bot.remove_command('help')
 @bot.event
 async def on_ready():
     print(f"Logged in as: {bot.user}")
-
+    sql = database(bot.db)
+    count = await sql.get_all_thread_channels()
+    activ = discord.Activity(type=discord.ActivityType.watching, name=f"{count} threads | {len(bot.guilds)} guilds")
+    await bot.change_presence(activity=activ)
 
 @bot.command()
 @commands.is_owner()
 async def reload_cog(ctx, cog):
     bot.reload_extension(cog)
     await ctx.send("Reload successful.")
-
 
 @bot.command(aliases=['invite', 'im', 'inviteme'])
 async def invite_me(ctx):
@@ -69,7 +71,7 @@ cogs = ['cogs.makethread',
         'cogs.embeds',
         'cogs.utils', 
         'cogs.create_category', 
-        'cogs.errors',
+        'cogs.errors'
         ]
 
 
@@ -77,10 +79,9 @@ for cog in cogs:
     bot.load_extension(cog)
 
 
-if __name__ == '__main__':
-    db_loop = asyncio.get_event_loop()
-    bot.prefix = psycopg2.connect(**DB_SETTINGS)
-    bot.db = db_loop.run_until_complete(asyncpg.create_pool(**DB_SETTINGS, max_inactive_connection_lifetime=480))
+db_loop = asyncio.get_event_loop()
+bot.prefix = psycopg2.connect(**DB_SETTINGS)
+bot.db = db_loop.run_until_complete(asyncpg.create_pool(**DB_SETTINGS, max_inactive_connection_lifetime=480))
 
 async def populate():
      sql = database(bot.db)
