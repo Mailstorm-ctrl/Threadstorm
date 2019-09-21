@@ -3,6 +3,7 @@ import typing
 import asyncio
 import json
 from cogs.embeds import TB_Embeds
+from cogs.checks import TB_Checks
 from database.database import database
 from discord.ext import commands
 
@@ -19,7 +20,9 @@ class TB_Lock_Threads(commands.Cog):
 
     @commands.command(name='lock',aliases=['tlock'])
     @commands.has_permissions(manage_messages=True)
-    @commands.check(is_thread)
+    @commands.check(TB_Checks.check_if_thread)
+    @commands.bot_has_permissions(manage_channels=True)
+    @commands.guild_only()
     async def lock_thread(self, ctx, *, reason: typing.Optional[str] = 'No reason provided.'):
         """Command to "lock" a thread. Goes through channel overwrites and denies send_message to all roles."""
         thread_locked_embed = await TB_Embeds.thread_locked(ctx.author, reason)
@@ -38,7 +41,9 @@ class TB_Lock_Threads(commands.Cog):
 
     @commands.command(name='unlock',aliases=['tunlock'])
     @commands.has_permissions(manage_messages=True)
-    @commands.check(is_thread)
+    @commands.check(TB_Checks.check_if_thread)
+    @commands.bot_has_permissions(manage_channels=True)
+    @commands.guild_only()
     async def unlock_thread(self, ctx):
         """The opposite of lock. Goes back through and assigns the original permissions to the channel."""
         sql = database(self.bot.db)
@@ -59,7 +64,8 @@ class TB_Lock_Threads(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name='delete', aliases=['tdelete'])
-    @commands.check(is_thread)
+    @commands.check(TB_Checks.check_if_thread)
+    @commands.guild_only()
     async def delete_thread(self, ctx):
         """Lets the author of a thread delete it or a guild member with the manage_channels permission."""
         sql = database(self.bot.db)
