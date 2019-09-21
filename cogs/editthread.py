@@ -2,6 +2,7 @@ import discord
 import typing
 from database.database import database
 from cogs.embeds import TB_Embeds
+from cogs.checks import TB_Checks
 from discord.ext import commands
 
 class TB_Edit_Threads(commands.Cog):
@@ -9,16 +10,10 @@ class TB_Edit_Threads(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def is_thread(ctx):
-        if ctx.channel.id in ctx.bot.thread_check_cache.get(ctx.guild.id):
-            return True
-        else:
-            return False
-
-
     @commands.command(name='keep', aliases=['tkeep'])
     @commands.has_permissions(manage_channels=True)
-    @commands.check(is_thread)
+    @commands.check(TB_Checks.check_if_thread)
+    @commands.guild_only()
     async def keep(self, ctx):
         sql = database(self.bot.db)
         setting = await sql.get_thread_info_by_channel_id(ctx.channel)
@@ -32,7 +27,8 @@ class TB_Edit_Threads(commands.Cog):
         
 
     @commands.command(name='edit', aliases=['tedit'])
-    @commands.check(is_thread)
+    @commands.check(TB_Checks.check_if_thread)
+    @commands.guild_only()
     async def thread_edit(self, ctx, part: str, *, text: typing.Optional[str] = 'Blank'):
         """Lets guild moderators and the owner of the thread edit/append to the original post."""
         if ctx.guild is None:
