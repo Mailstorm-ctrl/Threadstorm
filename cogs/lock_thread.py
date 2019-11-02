@@ -18,13 +18,13 @@ class TB_Lock_Threads(commands.Cog):
         else:
             return False
 
-    @commands.command(name='lock',aliases=['tlock'])
+    @commands.command(name='lock',aliases=['tlock'], description='Lock a thread')
     @commands.has_permissions(manage_messages=True)
     @commands.check(TB_Checks.check_if_thread)
-    @commands.bot_has_permissions(manage_channels=True)
+    @commands.bot_has_permissions(manage_channels=True, manage_roles=True)
     @commands.guild_only()
     async def lock_thread(self, ctx, *, reason: typing.Optional[str] = 'No reason provided.'):
-        """Command to "lock" a thread. Goes through channel overwrites and denies send_message to all roles."""
+        """This command will go through a threads permission tree and set the `send_message` permission to `Deny` unless a role/member has the `manage_message` permission."""
         thread_locked_embed = await TB_Embeds.thread_locked(ctx.author, reason)
         await ctx.send(embed=thread_locked_embed)
         sql = database(self.bot.db)
@@ -35,17 +35,17 @@ class TB_Lock_Threads(commands.Cog):
             await sql.update_channel_permissions_by_channel(ctx.channel, json.dumps(thread_permissions))
             for role in ctx.channel.overwrites:
                 if not role.permissions.manage_messages and role != ctx.guild.default_role:
-                    await ctx.channel.set_permissions(role, send_messages=False, reason=reason)
+                    await ctx.channel.set_permissions(role, send_messages=False, read_messages=True, reason=reason)
                 else:
                     continue
 
-    @commands.command(name='unlock',aliases=['tunlock'])
+    @commands.command(name='unlock',aliases=['tunlock'], description='Unlocks a thread')
     @commands.has_permissions(manage_messages=True)
     @commands.check(TB_Checks.check_if_thread)
-    @commands.bot_has_permissions(manage_channels=True)
+    @commands.bot_has_permissions(manage_channels=True, manage_roles=True)
     @commands.guild_only()
     async def unlock_thread(self, ctx):
-        """The opposite of lock. Goes back through and assigns the original permissions to the channel."""
+        """The opposite of lock. This will restore the permission structure to what it was when `lock_thread` was invoked."""
         sql = database(self.bot.db)
         thread_permissions = await sql.get_permissions_for_channel(ctx.channel)
         try:
@@ -63,11 +63,11 @@ class TB_Lock_Threads(commands.Cog):
         embed = await TB_Embeds.thread_unlocked(ctx.author)
         await ctx.send(embed=embed)
 
-    @commands.command(name='delete', aliases=['tdelete'])
+    @commands.command(name='delete', aliases=['tdelete'], description='Delete a singular thread')
     @commands.check(TB_Checks.check_if_thread)
     @commands.guild_only()
     async def delete_thread(self, ctx):
-        """Lets the author of a thread delete it or a guild member with the manage_channels permission."""
+        """A command that deletes a single thread. This command must be invoked within a thread and only the owner of the thread or members with the `manage_channels` permission can invoke this command."""
         sql = database(self.bot.db)
         thread_info = await sql.get_thread_info_by_channel_id(ctx.channel)
         thread_info = thread_info[0]
