@@ -13,15 +13,12 @@ class TB_Thread_Creation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='makethread',aliases=['tmake'])
+    @commands.command(name='makethread',aliases=['tmake'], description='Make a new thread')
     @commands.cooldown(2, 7200,type=commands.BucketType.member)
     @commands.bot_has_permissions(manage_messages=True, manage_channels=True)
     @commands.guild_only()
     async def manual_create(self, ctx):
-        """Lets members create their own threads. This command will put
-        "threads" that aren't in a custom category into the general threads category the bot made when it joined the server.
-        If the invoked command is in a category that was made with the bot, the created thread will appear in that category.
-        This lets servers have organized threads."""
+        """Pretty simple really. Server members can make their own threads. Run the command and then follow the directions"""
 
         if ctx.guild is None:
             return
@@ -30,7 +27,11 @@ class TB_Thread_Creation(commands.Cog):
 
         sql = database(self.bot.db)
         get_chan = await sql.get_thread_category_id(ctx.guild)
-        thread_category = ctx.guild.get_channel(get_chan[0])
+        try:
+            thread_category = ctx.guild.get_channel(get_chan[0])
+        except IndexError:
+            await ctx.send(f"It seems your guild is not located in the database. Please run: `{ctx.prefix}.tsetup`\nMake sure I'm allowed to manage channels, messages, and roles before running this!")
+            return
         abort = None
         thread = {}
         step = 1
