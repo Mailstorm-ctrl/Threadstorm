@@ -10,6 +10,7 @@ class TB_Utils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channel_checker.start()
+        self.update_status.start()
         self.integrity_check.start()
 
     @commands.Cog.listener()
@@ -43,10 +44,12 @@ class TB_Utils(commands.Cog):
         except TypeError:
             pass
 
-    @commands.command(name='setup', aliases=['tsetup'], hidden=True)
+    @commands.command(name='setup', aliases=['tsetup'], description='Initialize guild')
     @commands.has_permissions(manage_guild=True)
+    @commands.bot_has_permissions(manage_channels=True)
     @commands.guild_only()
     async def create_guild_join(self, ctx):
+        """If for some reason your guild was NOT added to the database, this command will force your guild into it."""
         thread_category = discord.utils.get(ctx.guild.categories, name='THREADS')
         sql = database(self.bot.db)
         if thread_category is None:
@@ -54,18 +57,48 @@ class TB_Utils(commands.Cog):
         await sql.joined_guild(ctx.guild, thread_category)
         await ctx.send('Setup ran. Guild added to database.')
 
-    @commands.command(name='prefix', aliases=['tprefix'])
+    @commands.command(name='prefix', aliases=['tprefix'], description='Sets the custom prefix')
     @commands.has_permissions(manage_roles=True)
     @commands.guild_only()
     async def update_prefix(self, ctx, prefix: str):
+        """Lets you modify the servers prefix. You must have the `manage_roles` permission to use this."""
         sql = database(self.bot.db)
         await sql.update_prefix(ctx.guild, prefix)
         await ctx.send(f"Prefix updated to: {prefix}")
         return
 
-    @commands.command(name='help', aliases=['thelp'])
-    async def thelp(self, ctx): # Yes I know bad. Use built-in help, don't hard-code yada
-        embed = await TB_Embeds.thelp(ctx)
+    @commands.command(name='help', aliases=['thelp'], hidden=True)
+    async def new_help(self, ctx, *, cmd=None):
+        if cmd is None:
+            embed=discord.Embed(title=f"{ctx.bot.user.name} Help Menu", description=f"Need some help? Use `{ctx.prefix}thelp command` to get specific help", color=0x69dce3)
+            embed.set_author(name=ctx.bot.user.name, icon_url=ctx.bot.user.avatar_url)
+            cmd_list = {}
+            for command in ctx.bot.commands:
+                try:
+                    if await command.can_run(ctx) and not command.hidden:
+                        cmd_list[command.name] = command.description
+                except discord.ext.commands.CommandError:
+                    continue
+            avail_cmds = []
+            longest_command = max(cmd_list.keys(), key=len)
+            for k,v in cmd_list.items():
+                avail_cmds.append('`' + k + ' ' + '-'*(len(longest_command)-len(k)) + '->>` ' + v)
+            avail_cmds = '\n'.join(sorted(avail_cmds))
+            embed.add_field(name=f'Available Commands:', value=avail_cmds, inline=False)
+            embed.add_field(name=f'Support Server', value='This bot has a support server! If you run into issues or have ideas, feel free to join. I listen to everything you have to say. Good and bad!\nInvite link: [discord.gg/M8DmU86](https://discord.gg/M8DmU86)', inline=False)
+            embed.add_field(name='Want to help this bot grow?', value=f'Spread the word! You can also help by giving this bot a vote [here (top.gg)](https://top.gg/bot/617376702187700224/vote) or [here (botsfordiscord.com)](https://botsfordiscord.com/bot/617376702187700224/vote).', inline=False)
+            embed.set_footer(text=f"Only commands you have permission to run in #{ctx.channel.name} are shown here.")
+        else:
+            help_cmd = ctx.bot.get_command(cmd)
+            if help_cmd is None:
+                await ctx.send("Unable to find that command. Run this again with no arguments for a list of commands.")
+                return
+            aliases = [alias for alias in help_cmd.aliases]
+            embed = discord.Embed(title=f'{help_cmd.name.upper()} MAN PAGE', description=f'This is all the info you need for the `{ctx.prefix}{help_cmd.name}` command.', color=0x69dce3)
+            embed.set_author(name=ctx.bot.user.name, icon_url=ctx.bot.user.avatar_url)
+            embed.add_field(name='Alises for this command:', value=', '.join(aliases), inline=False)
+            embed.add_field(name='Usage:', value=f'{ctx.prefix}{help_cmd.name} {help_cmd.signature}')
+            embed.add_field(name='Description:', value=help_cmd.short_doc, inline=False)
         await ctx.send(embed=embed)
 
     @tasks.loop(count=1)
@@ -75,13 +108,27 @@ class TB_Utils(commands.Cog):
         for guild in self.bot.guilds:
             if guild.id not in configured_guilds:
                 try:
-                    category = await guild.create_category('Threads', reason='Initial category of threads creation.')
+                    category = await guild.create_category('THREADS', reason='Initial category of threads creation. | Integrity Check')
                     await sql.joined_guild(guild, category)
                 except:
                     continue
 
     @integrity_check.before_loop
     async def wait2(self):
+        await self.bot.wait_until_ready()
+
+    @tasks.loop(hours=1.0)
+    async def update_status(self):
+        sql = database(self.bot.db)
+        count = await sql.get_all_thread_channels()
+        activ = discord.Activity(type=discord.ActivityType.watching, name=f"{count} threads | {len(self.bot.guilds)} guilds")
+        try:
+            await bot.change_presence(activity=activ)
+        except:
+            pass
+
+    @update_status.before_loop
+    async def wait3(self):
         await self.bot.wait_until_ready()
 
     @tasks.loop(hours=24.0)
@@ -104,6 +151,8 @@ class TB_Utils(commands.Cog):
                 if channel_found:
                     embed = await TB_Embeds.inactive_lock(thread_channel)
                     await thread_channel.send(embed=embed)
+                    thread_permissions = {role.id:[thread_channel.overwrites.get(role).pair()[0].value, thread_channel.overwrites.get(role).pair()[1].value] for role in thread_channel.overwrites}
+                    await sql.update_channel_permissions_by_channel(thread_channel, json.dumps(thread_permissions))
                     for role in thread_channel.overwrites:
                         await thread_channel.set_permissions(role, send_messages=False)
             except Exception as e:
