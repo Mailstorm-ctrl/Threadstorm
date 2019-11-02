@@ -31,25 +31,12 @@ async def on_ready():
     activ = discord.Activity(type=discord.ActivityType.watching, name=f"{count} threads | {len(bot.guilds)} guilds")
     await bot.change_presence(activity=activ)
 
-@bot.command()
+
+@bot.command(hidden=True)
 @commands.is_owner()
 async def reload_cog(ctx, cog):
     bot.reload_extension(cog)
     await ctx.send("Reload successful.")
-
-@bot.command(aliases=['invite', 'im', 'inviteme'])
-async def invite_me(ctx):
-    embed=discord.Embed(title="Invite Link",
-                        description=(
-                                    """[Click here to invite me to your server]
-                                    (https://discordapp.com/oauth2/authorize?client_id=617376702187700224&permissions=268561424&scope=bot).
-                                    \nPlease grant all the permissions I ask for. If you don't, I wont function correctly."""
-                                    ), 
-                                    color=0x0097ff
-                        )
-    embed.set_author(name=bot.user.name, icon_url=bot.user.avatar_url)
-    embed.set_thumbnail(url=bot.user.avatar_url)
-    await ctx.send(embed=embed)
 
 
 load_dotenv('thread_bot.env')
