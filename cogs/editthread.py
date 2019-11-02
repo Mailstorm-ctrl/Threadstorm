@@ -10,11 +10,12 @@ class TB_Edit_Threads(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='keep', aliases=['tkeep'])
+    @commands.command(name='keep', aliases=['tkeep'], description='Toggle the delete flag')
     @commands.has_permissions(manage_channels=True)
     @commands.check(TB_Checks.check_if_thread)
     @commands.guild_only()
     async def keep(self, ctx):
+        """This is a toggle command. If the delete flag is set to "False", the bot will not delete this channel even if it becomes inactive. Only members with the `manage_channels` permission can run this."""
         sql = database(self.bot.db)
         setting = await sql.get_thread_info_by_channel_id(ctx.channel)
         if setting[0][6]:
@@ -26,11 +27,11 @@ class TB_Edit_Threads(commands.Cog):
         await ctx.send(embed=embed)
         
 
-    @commands.command(name='edit', aliases=['tedit'])
+    @commands.command(name='edit', aliases=['tedit'], description='Edit a threads OP')
     @commands.check(TB_Checks.check_if_thread)
     @commands.guild_only()
     async def thread_edit(self, ctx, part: str, *, text: typing.Optional[str] = 'Blank'):
-        """Lets guild moderators and the owner of the thread edit/append to the original post."""
+        """A command that lets the thread owner or members with the `manage_messages` permission change/append thread OPs."""
         if ctx.guild is None:
             await ctx.send("You cannot use this command in a DM.")
             return
