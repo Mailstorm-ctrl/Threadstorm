@@ -30,7 +30,7 @@ class TB_Thread_Creation(commands.Cog):
         try:
             thread_category = ctx.guild.get_channel(get_chan[0])
         except IndexError:
-            await ctx.send(f"It seems your guild is not located in the database. Please run: `{ctx.prefix}.tsetup`\nMake sure I'm allowed to manage channels, messages, and roles before running this!")
+            await ctx.send(f"It seems your guild is not located in the database. Please run: `{ctx.prefix}tsetup`\nMake sure I'm allowed to manage channels, messages, and roles before running this!")
             return
         abort = None
         thread = {}

@@ -17,6 +17,13 @@ class TB_Category_Creation(commands.Cog):
     @commands.guild_only()
     async def create_category(self, ctx, *, category_name):
         """This command will create a new category in the server with the name you give it. You may move this category around and rename it."""
+        sql = database(self.bot.db)
+        custom_categories = await sql.get_custom_categories(ctx.guild)
+        try:
+            print(custom_categories[0])
+        except IndexError:
+            await ctx.send(f"It seems your guild is not located in the database. Please run: `{ctx.prefix}tsetup` Make sure I'm allowed to manage channels, messages, and roles before running this!")
+            return
         category = f'{category_name[:96]}...'
         thread_category = await ctx.guild.create_category(category, overwrites=ctx.channel.overwrites)
         custom_category_hub_channel = await ctx.guild.create_text_channel(f'Create threads here!', category=thread_category)

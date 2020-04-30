@@ -45,7 +45,7 @@ class TB_Lock_Threads(commands.Cog):
     @commands.bot_has_permissions(manage_channels=True, manage_roles=True)
     @commands.guild_only()
     async def unlock_thread(self, ctx):
-        """The opposite of lock. This will restore the permission structure to what it was when `lock_thread` was invoked."""
+        """The opposite of lock. This will restore the permission structure to what it was when `lock` was invoked."""
         sql = database(self.bot.db)
         thread_permissions = await sql.get_permissions_for_channel(ctx.channel)
         try:

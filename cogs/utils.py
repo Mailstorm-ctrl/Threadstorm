@@ -1,6 +1,7 @@
 import discord
 import time
 import copy
+import json
 from cogs.embeds import TB_Embeds
 from database.database import database
 from discord.ext import tasks, commands
@@ -77,7 +78,7 @@ class TB_Utils(commands.Cog):
                 try:
                     if await command.can_run(ctx) and not command.hidden:
                         cmd_list[command.name] = command.description
-                except discord.ext.commands.CommandError:
+                except (discord.ext.commands.CommandError, IndexError):
                     continue
             avail_cmds = []
             longest_command = max(cmd_list.keys(), key=len)
@@ -123,7 +124,7 @@ class TB_Utils(commands.Cog):
         count = await sql.get_all_thread_channels()
         activ = discord.Activity(type=discord.ActivityType.watching, name=f"{count} threads | {len(self.bot.guilds)} guilds")
         try:
-            await bot.change_presence(activity=activ)
+            await self.bot.change_presence(activity=activ)
         except:
             pass
 
