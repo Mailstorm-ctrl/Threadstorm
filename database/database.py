@@ -10,7 +10,6 @@ class database:
     async def joined_guild(self, guild, category):
         async with self.con.acquire() as con:
             await con.execute(f"INSERT INTO guild_configuration(guild_id, prefix, threads_category_id) VALUES($1, $2, $3) ON CONFLICT (guild_id) DO UPDATE SET threads_category_id=$3;", guild.id, '.', category.id)
-    
     def get_prefix(self, guild):
         cur = self.con.cursor()
         cur.execute(f'SELECT prefix FROM guild_configuration WHERE guild_id=%s;', (guild.id,))
@@ -81,6 +80,10 @@ class database:
                 for channel in q:
                     cache[guild].append(channel[0])
             return cache
+
+    async def get_all_thread_channels(self):
+        async with self.con.acquire() as con:
+            return len([record[0] for record in await con.fetch('SELECT thread_id FROM threads;')])
 
     async def get_guilds(self):
         async with self.con.acquire() as con:
