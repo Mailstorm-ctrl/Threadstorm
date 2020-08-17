@@ -19,7 +19,7 @@ An attempt to bring forum functionality to Discord. Including thread locking, ca
 When using commands that create a text channel or a new category, the channel/category will have *the same permissions as the channel the command was invoked in*. So if your server requires a role to gain access to the rest of the server, the commands will handle this automatically to prevent bypassing your checkpoint.
 
 # Invite this bot to your server:
-https://threadstorm.app/invite
+[https://threadstorm.app/invite](https://threadstorm.app/invite)
 ##### Why it needs the permissions it request:
 `Manage Channel`: This is needed so it can create channels. When you invite this bot to your server, it will create a category named "threads" which is the default location all threads will be put. This also allows the bot to lock/unlock threads. 
 
@@ -27,7 +27,9 @@ https://threadstorm.app/invite
 
 `Manage Roles`: Needed to lock/unlock threads.
 
+`View Audit Log`: SOON! This lets the bot attempt to auto-recover deleted categories.
+
 # Support server
 Join this server to report issues or get help with the bot. Alternatively, join to talk with other people.
 
-https://discord.gg/M8DmU86
+[Threadstorm Support Server](https://discord.gg/M8DmU86)
