@@ -1,37 +1,33 @@
-## Welcome to GitHub Pages
+# Threadstorm
+An attempt to bring forum functionality to Discord. Including thread locking, category creation for organization and thread clean-up.
 
-You can use the [editor on GitHub](https://github.com/Mailstorm-ctrl/Threadstorm/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+# Commands:
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+| Command | Arguments| Description |
+|:---:|:---:|:---|
+| `.tmake` | N/A | This command will start the process of making a thread. Ask for a thread title and the body. Has a cooldown of 2 uses per hour. Takes no arguments.|
+| `.tedit` | REQUIRED: body, title or image | Allows the author of the thread or a member with the manage_messages permissions to modify the threads original post. You may upload an image with the command to use your image, or provide a valid url.<br />Example:<br />`.tedit title The Super Shotty is an objectivly bad weapon. It is underpowered`|
+| `.tkeep` | N/A | Allows you to "keep" a thread from being deleted due to inactivity. This is a toggle command. Run this command to toggle the delete flag on and off. You will need the `manage_channels` permission to run this.| 
+| `.tlock` | OPTIONAL: reason | Allows members with the manage_message permission to lock threads. This will go through and set the send_messages permission to False for every role that has access to the channel/thread. This is a moderation command.<br />Example:<br />`.tlock The Super Shotty is fine. Get better.`|
+| `.tunlock` | N/A | Unlocks a thread. Returns to the channels original permission structure. |
+| `.tcreate` | REQUIRED: category-name | Lets you create a custom category for your server. Must have the manage_channels permission to run this.<br />Example:<br />`.tcreate Game Talk`|
+| `.tdc` | N/A | Deletes a custom category. This command will delete all channels within the invoked category and finally the category itself. Will need to verify action before deletion occurs. |
+|`.tprefix` | REQUIRED: prefix | Lets you set a custom guild prefix. Max allowed prefix length is 4 characters. |
+| `.thelp` | N/A | Displays this help menu in Discord. |
 
-### Markdown
+##### Command Notes:
+When using commands that create a text channel or a new category, the channel/category will have *the same permissions as the channel the command was invoked in*. So if your server requires a role to gain access to the rest of the server, the commands will handle this automatically to prevent bypassing your checkpoint.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+# Invite this bot to your server:
+https://threadstorm.app/invite
+##### Why it needs the permissions it request:
+`Manage Channel`: This is needed so it can create channels. When you invite this bot to your server, it will create a category named "threads" which is the default location all threads will be put. This also allows the bot to lock/unlock threads. 
 
-```markdown
-Syntax highlighted code block
+`Manage Messages`: When a thread is created, it will pin the original post (In the channel the bot makes). For custom categories, it will delete commands used to create threads to keep the channel clean.
 
-# Header 1
-## Header 2
-### Header 3
+`Manage Roles`: Needed to lock/unlock threads.
 
-- Bulleted
-- List
+# Support server
+Join this server to report issues or get help with the bot. Alternatively, join to talk with other people.
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Mailstorm-ctrl/Threadstorm/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+https://discord.gg/M8DmU86
