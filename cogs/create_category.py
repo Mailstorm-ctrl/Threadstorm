@@ -1,9 +1,5 @@
 import discord
-import json
 import asyncio
-from database.database import database
-from cogs.embeds import TB_Embeds
-from cogs.checks import TB_Checks
 from discord.ext import commands
 
 class TB_Category_Creation(commands.Cog):
@@ -16,71 +12,53 @@ class TB_Category_Creation(commands.Cog):
     @commands.bot_has_permissions(manage_channels=True)
     @commands.guild_only()
     async def create_category(self, ctx, *, category_name):
-        """This command will create a new category in the server with the name you give it. You may move this category around and rename it."""
-        sql = database(self.bot.db)
-        custom_categories = await sql.get_custom_categories(ctx.guild)
-        try:
-            print(custom_categories[0])
-        except IndexError:
-            await ctx.send(f"It seems your guild is not located in the database. Please run: `{ctx.prefix}tsetup` Make sure I'm allowed to manage channels, messages, and roles before running this!")
-            return
         category = f'{category_name[:96]}...'
         thread_category = await ctx.guild.create_category(category, overwrites=ctx.channel.overwrites)
         custom_category_hub_channel = await ctx.guild.create_text_channel(f'Create threads here!', category=thread_category)
-        sql = database(self.bot.db)
-        custom_categories = await sql.get_custom_categories(ctx.guild)
-        if custom_categories[0] is not None:
-            custom_categories = json.loads(custom_categories[0])
-            custom_categories[str(ctx.guild.id)].append(thread_category.id)
-        else:
-            custom_categories = {}
-            custom_categories[ctx.guild.id] = [thread_category.id]
-        try:
-            await sql.update_custom_categories(json.dumps(custom_categories), ctx.guild)
-        except:
-            await ctx.send(f"It seems your guild is not located in the database. Please run: `{ctx.prefix}.tsetup`\nMake sure I'm allowed to manage channels, messages, and roles before running this!")
-            return
-        embed1 = await TB_Embeds.hub_channel(ctx, category)
-        embed2 = await TB_Embeds.category_made(ctx, custom_category_hub_channel)
-        pin_this = await custom_category_hub_channel.send(embed=embed1)
-        await pin_this.pin()
-        await ctx.send(embed=embed2)
+        self.bot.cache[ctx.guild.id]["custom_categories"][thread_category.id] = custom_category_hub_channel.id
         
+        hub_channel_embed = discord.Embed(title="THREAD HUB CHANNEL", description=f'Please create threads for the category `{category_name[:96]}` here.', color=self.bot.DEFAULT_COLOR)
+        hub_channel_embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
+
+        confirmation = discord.Embed(title="Category created!", description=f'Please use {custom_category_hub_channel.mention} to place threads into this category. I\'ve left a reminder in there too.', color=self.bot.DEFAULT_COLOR)
+        confirmation.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
+        confirmation.set_footer(text='You can rename this channel to whatever you wish. You can also move the category around.')
+
+        pin_this = await custom_category_hub_channel.send(embed=hub_channel_embed)
+        await pin_this.pin()
+        await ctx.send(embed=confirmation)
+        await self.bot.write_db(ctx.guild)
+    
     @commands.command(name='dcategory', aliases=['tdelete_category', 'tdc'], description='Delete a custom category')
     @commands.has_permissions(manage_guild=True)
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.check(TB_Checks.check_if_category)
     @commands.guild_only()
     async def delete_category(self, ctx):
         """This command will wipe out a custom category. Meaning all threads will be deleted. Will need to verify before any action is taken."""
-        sql = database(self.bot.db)
-        default = True
-        custom_category_check = await sql.get_custom_categories(ctx.guild)
-        custom_category_check = json.loads(custom_category_check[0])
-        # if ctx.channel.category.id in custom_category_check.get(str(ctx.guild.id)):
-        #     default = False
-        # if default:
-        #     await ctx.send("This command cannot be ran in this channel. It can only be ran in channels that belong to a category that I have made and isn't the default channel.")
-        #     return
-        #else:
-        await ctx.send(f"""Are you sure? This will delete the category and __***ALL***__ channels that belong to this category. To confirm, please paste in the categorys ID:\n{ctx.channel.category.id}""")
+        category = ctx.channel.category
+        error_msg = "This command cannot be ran here. Sorry. Please run it in a channel that is a part of one of your custom categories."
+        if category is None:
+            await ctx.send(error_msg)
+            return
+        if category.id not in self.bot.cache[ctx.guild.id]["custom_categories"]:
+            await ctx.send(error_msg)
+            return
+
+        confirm = await ctx.send(f"Are you sure you want to do this? This will delete `{ctx.channel.category.name}` and __***ALL***__ channels that belong to `{ctx.channel.category.name}` ***(Even channels I did not make!)***.\nTo confirm this action, please react with the appropriate reaction.")
+        await confirm.add_reaction('✔️')
+        def check(reaction, user):
+            return str(reaction.emoji) == '✔️' and reaction.message == confirm and user == ctx.author and reaction.message.channel.category.id in self.bot.cache[ctx.guild.id]["custom_categories"]
         try:
-            confirm = await self.bot.wait_for('message',
-                                            check=lambda m : m.author.id == ctx.author.id and int(m.content) in custom_category_check.get(str(ctx.guild.id)),
-                                            timeout=30
-                                            )
-        except asyncio.TimeoutError:
-            await ctx.send("Timeout reached. No action has been taken.")
+            react, user = await self.bot.wait_for('reaction_add', check=check, timeout=60)
+        except asynio.TimeoutError:
+            await ctx.send("Timeout reached. This action times out after 60 seconds.")
             return
         else:
             for channel in ctx.channel.category.channels:
                 await channel.delete(reason='PURGE CATEGORY')
-                await sql.delete_threads(channel)
-            await ctx.channel.category.delete(reason='PURGE CATEGORY')
-            custom_categories = await sql.get_custom_categories(ctx.guild)
-            custom_categories = json.loads(custom_categories[0])
-            custom_categories[str(ctx.guild.id)].remove(ctx.channel.category.id)
-            await sql.update_custom_categories(custom_categories, json.dumps(custom_categories))
+                self.bot.cache[ctx.guild.id]['active_threads'].pop(channel.id, None)
+            self.bot.cache[ctx.guild.id]["custom_categories"].pop(ctx.channel.category.id, None)
+            await self.bot.write_db(ctx.guild)
 
 def setup(bot):
     bot.add_cog(TB_Category_Creation(bot))
