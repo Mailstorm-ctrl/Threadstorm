@@ -1,4 +1,4 @@
-# Threadstorm
+# Threadstorm [![Discord Bots](https://top.gg/api/widget/status/617376702187700224.svg)](https://top.gg/bot/617376702187700224)
 An attempt to bring forum functionality to Discord. Including thread locking, category creation for organization and thread clean-up.
 
 # Known issues:
