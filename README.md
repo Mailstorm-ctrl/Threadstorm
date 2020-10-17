@@ -2,7 +2,7 @@
 An attempt to bring forum functionality to Discord. Including thread locking, category creation for organization and thread clean-up.
 
 # Usage example:
-[![Threadstorm Demo](https://threadstorm.app/assets/DEMO.gif)](https://www.youtube.com/watch?v=dzBKWk7ynSg)
+![](https://threadstorm.app/assets/DEMO.gif)
 
 # Invite this bot to your server:
 https://threadstorm.app/invite
